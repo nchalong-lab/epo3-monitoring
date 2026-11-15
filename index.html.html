@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ศูนย์เฝ้าระวังข้อมูลข่าวสาร สคพ.3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;600;700;800&family=Noto+Sans+Thai:wght@400;500;600;700&family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#F6F1E4;--cream-2:#EEE6D2;--navy:#102133;--navy-2:#1B3350;--navy-3:#24425f;
+    --ink:#211D16;--muted:#7A7263;--amber:#E08B2A;--amber-deep:#C36F1A;--magenta:#A6469E;
+    --green:#3D8B5F;--green-bg:#E4F1E8;--red:#C1483F;--red-bg:#F8E7E4;--gray:#8A8578;
+    --line:#DED2AE;--line-soft:#E9E1CB;--white:#FFFFFF;
+    --radius-lg:18px;--radius-md:12px;--radius-sm:8px;
+    --shadow:0 4px 16px rgba(16,33,51,0.08);--shadow-sm:0 2px 8px rgba(16,33,51,0.06);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--cream);color:var(--ink);font-family:'Noto Sans Thai',sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased;}
+  h1,h2,h3,h4{font-family:'Kanit',sans-serif;}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 24px;}
+  button{font-family:'Noto Sans Thai',sans-serif;cursor:pointer;border:none;}
+
+  /* ---------- header ---------- */
+  .header{background:linear-gradient(160deg,var(--navy) 0%,var(--navy-2) 100%);color:#fff;padding:28px 0 0;}
+  .header-inner{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;}
+  .brand{display:flex;align-items:center;gap:16px;}
+  .brand-badge{width:56px;height:56px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#2c4a6a,#0d1c2c);display:flex;align-items:center;justify-content:center;font-size:26px;border:2px solid rgba(255,255,255,0.25);flex-shrink:0;}
+  .eyebrow{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--amber);font-weight:600;margin-bottom:4px;}
+  .brand-text h1{font-size:28px;font-weight:700;margin:0;}
+  .brand-text .sub{font-size:13px;color:#C7D2DC;margin-top:4px;}
+  .header-badges{display:flex;align-items:center;gap:12px;}
+  .badge-24{background:#fff;color:var(--navy);border-radius:12px;padding:8px 14px;font-family:'Kanit';font-weight:700;font-size:20px;line-height:1;text-align:center;}
+  .badge-24 span{display:block;font-size:9px;font-weight:600;letter-spacing:1px;margin-top:2px;color:var(--muted);}
+  .live-pill{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.18);border-radius:20px;padding:8px 14px;font-size:12px;font-weight:600;}
+  .live-dot{width:8px;height:8px;border-radius:50%;background:#5FD98A;animation:pulse 1.8s infinite;}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(95,217,138,.55);}70%{box-shadow:0 0 0 8px rgba(95,217,138,0);}100%{box-shadow:0 0 0 0 rgba(95,217,138,0);}}
+  .ticker-outer{overflow:hidden;border-top:1px solid rgba(255,255,255,0.12);margin-top:24px;background:rgba(0,0,0,0.15);}
+  .ticker-track{display:flex;gap:36px;white-space:nowrap;width:max-content;padding:10px 0;animation:scroll 32s linear infinite;}
+  @keyframes scroll{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+  .ticker-item{display:flex;align-items:center;gap:8px;font-size:12.5px;color:#DCE4EB;}
+  .ticker-dot{width:6px;height:6px;border-radius:50%;background:var(--amber);flex-shrink:0;}
+  @media (prefers-reduced-motion:reduce){.live-dot,.ticker-track{animation:none;}}
+
+  /* ---------- stats ---------- */
+  .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:-30px;position:relative;z-index:2;}
+  .stat-card{background:var(--white);border-radius:var(--radius-md);padding:18px 20px;box-shadow:var(--shadow);border:1px solid var(--line-soft);}
+  .stat-num{font-family:'Kanit';font-size:30px;font-weight:700;color:var(--navy);}
+  .stat-label{font-size:12.5px;color:var(--muted);margin-top:2px;}
+  .stat-card.red .stat-num{color:var(--red);} .stat-card.green .stat-num{color:var(--green);} .stat-card.amber .stat-num{color:var(--amber-deep);}
+
+  section{padding:40px 0 0;}
+  .section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:18px;flex-wrap:wrap;}
+  .section-title{font-size:22px;font-weight:700;margin:0;}
+  .section-desc{color:var(--muted);font-size:13.5px;margin:4px 0 0;}
+
+  /* ---------- province cards (same look as LINE cards) ---------- */
+  .province-board{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;}
+  .pcard{background:#fff;border-radius:16px;overflow:hidden;border:1px solid var(--line-soft);box-shadow:var(--shadow-sm);display:flex;flex-direction:column;}
+  .pcard-head{background:var(--navy);padding:14px;color:#fff;}
+  .pcard-head .org{font-size:10px;font-weight:700;color:var(--amber);line-height:1.3;}
+  .pcard-head .pname{font-family:'Kanit';font-size:19px;font-weight:700;margin-top:4px;}
+  .pcard-head .pwhen{font-size:11px;color:#C7D2DC;margin-top:2px;}
+  .pcard-status{margin:12px 12px 0;border-radius:10px;padding:10px;text-align:center;color:#fff;font-family:'Kanit';font-weight:600;font-size:15px;}
+  .pcard-status.n{background:var(--green);} .pcard-status.f{background:var(--red);} .pcard-status.x{background:var(--gray);}
+  .pcard-body{padding:12px 14px 16px;font-size:12.5px;}
+  .plabel{font-size:10.5px;color:var(--gray);margin-top:8px;}
+  .plabel:first-child{margin-top:0;}
+  .pdetail{color:var(--ink);word-break:break-word;}
+  .board-note{background:#fff;border:1px dashed var(--line);border-radius:var(--radius-md);padding:22px;text-align:center;color:var(--muted);font-size:13.5px;grid-column:1/-1;}
+
+  /* ---------- history grid ---------- */
+  .hist{margin-top:22px;background:#fff;border:1px solid var(--line-soft);border-radius:var(--radius-lg);padding:18px 20px;box-shadow:var(--shadow-sm);}
+  .hist h3{font-size:15px;margin:0 0 2px;}
+  .hist .hint{font-size:12px;color:var(--muted);margin:0 0 12px;}
+  .h-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap;}
+  .h-day{width:130px;font-size:13px;font-weight:600;color:var(--navy-2);}
+  .h-cell{min-width:104px;padding:7px 12px;border-radius:10px;font-size:12.5px;font-weight:600;border:2px solid transparent;}
+  .h-cell.n{background:var(--green-bg);color:#245C3D;} .h-cell.f{background:var(--red-bg);color:#7E2D26;}
+  .h-cell.x{background:#EFEBDD;color:#9A9384;} .h-cell.w{background:#fff;color:#B4AE9F;border:1px dashed var(--line);}
+  .h-cell.sel{border-color:var(--navy);}
+  .h-cell:disabled{cursor:default;}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:10px;}
+  .legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:middle;}
+
+  /* ---------- steps ---------- */
+  .steps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;}
+  .step-card{background:var(--white);border-radius:var(--radius-lg);padding:20px;border:1px solid var(--line-soft);box-shadow:var(--shadow-sm);display:flex;flex-direction:column;gap:8px;}
+  .step-num{width:34px;height:34px;border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Kanit';font-weight:700;}
+  .step-card:nth-child(odd) .step-num{background:var(--magenta);} .step-card:nth-child(even) .step-num{background:var(--amber-deep);}
+  .step-icon{font-size:24px;} .step-title{font-weight:700;font-size:15px;} .step-desc{font-size:12.5px;color:var(--muted);}
+
+  /* ---------- panels / form ---------- */
+  .two-col{display:grid;grid-template-columns:1fr 1.5fr;gap:22px;align-items:start;}
+  .panel{background:var(--white);border-radius:var(--radius-lg);border:1px solid var(--line-soft);box-shadow:var(--shadow-sm);padding:22px;}
+  .panel h3{font-size:17px;margin:0 0 4px;}
+  .panel-sub{font-size:12.5px;color:var(--muted);margin:0 0 16px;}
+  .province-group{margin-bottom:14px;}
+  .province-name{font-size:11.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--amber-deep);margin-bottom:6px;}
+  .channel-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 12px;border-radius:var(--radius-sm);border:1px solid var(--line-soft);margin-bottom:6px;text-decoration:none;color:var(--ink);font-size:13px;}
+  .channel-item:hover{background:var(--cream-2);}
+  .ctype{font-size:11px;color:var(--muted);background:var(--cream-2);border-radius:20px;padding:2px 9px;flex-shrink:0;}
+  .cname{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .go{color:var(--amber-deep);}
+
+  label{display:block;font-size:12.5px;font-weight:600;color:var(--navy-2);margin-bottom:5px;}
+  input[type=text],input[type=date],input[type=password],textarea{width:100%;border:1px solid var(--line);border-radius:var(--radius-sm);padding:9px 11px;font-family:'Noto Sans Thai';font-size:13.5px;background:#FCFAF3;color:var(--ink);}
+  input:focus,textarea:focus,summary:focus-visible{outline:2px solid var(--amber);outline-offset:1px;}
+  textarea{resize:vertical;min-height:60px;}
+  .form-top{display:grid;grid-template-columns:200px 1fr;gap:16px;margin-bottom:18px;}
+  .seg{display:flex;gap:6px;flex-wrap:wrap;}
+  .seg label{position:relative;display:inline-block;margin:0;cursor:pointer;}
+  .seg input{position:absolute;opacity:0;pointer-events:none;}
+  .seg span{display:inline-block;padding:8px 15px;border-radius:20px;border:1px solid var(--line);background:#FCFAF3;font-size:13px;font-weight:600;color:var(--muted);}
+  .seg input:checked + span{background:var(--navy);color:#fff;border-color:var(--navy);}
+  .seg input:focus-visible + span{outline:2px solid var(--amber);outline-offset:2px;}
+  .tog input[value="n"]:checked + span{background:var(--green);border-color:var(--green);}
+  .tog input[value="f"]:checked + span{background:var(--red);border-color:var(--red);}
+  .prow-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px;font-weight:700;font-size:13.5px;}
+  .linkbtn{background:none;color:var(--amber-deep);font-size:12.5px;font-weight:600;text-decoration:underline;padding:4px;}
+  .prow{border:1px solid var(--line-soft);border-radius:var(--radius-md);padding:10px 12px;margin-bottom:8px;background:#FEFCF6;}
+  .prow-top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;}
+  .prow-name{font-weight:700;font-size:14px;}
+  .prow-name small{display:block;font-weight:400;color:var(--muted);font-size:11.5px;}
+  .prow-more{display:none;margin-top:10px;}
+  .prow-more.show{display:block;}
+  .prow-more label{margin-top:8px;}
+  .field-msg{font-size:11.5px;color:var(--red);margin-top:4px;display:none;}
+  .field-msg.show{display:block;}
+  .field-error{border-color:var(--red) !important;background:#FDF3F1 !important;}
+  details.people{margin:14px 0 4px;border:1px solid var(--line-soft);border-radius:var(--radius-md);padding:10px 14px;background:#FEFCF6;}
+  details.people summary{cursor:pointer;font-weight:700;font-size:13.5px;}
+  .people-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;}
+  .people-grid h4{grid-column:1/-1;margin:6px 0 0;font-size:13px;color:var(--amber-deep);}
+  .btn-primary{background:var(--navy);color:#fff;padding:11px 22px;border-radius:var(--radius-sm);font-weight:600;font-size:14px;}
+  .btn-primary:hover{background:var(--navy-3);} .btn-primary:disabled{opacity:.6;cursor:default;}
+  .btn-big{width:100%;padding:14px;font-size:15px;margin-top:14px;}
+  .btn-secondary{background:transparent;color:var(--muted);padding:10px 16px;border-radius:var(--radius-sm);font-weight:600;font-size:13.5px;border:1px solid var(--line);}
+  .btn-secondary:hover{background:var(--cream-2);} .btn-secondary:disabled{opacity:.6;cursor:default;}
+  .lockbox{text-align:center;padding:26px 14px;background:var(--cream-2);border-radius:var(--radius-md);}
+  .lockbox .lock-icon{font-size:30px;}
+  .lockbox p{font-size:13px;color:var(--muted);margin:6px 0 14px;}
+  .lockrow{display:flex;gap:8px;max-width:340px;margin:0 auto;}
+
+  /* ---------- log table ---------- */
+  .log-controls{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;}
+  .log-controls input{width:auto;min-width:230px;}
+  .log-controls select{border:1px solid var(--line);border-radius:var(--radius-sm);padding:9px 11px;font-family:'Noto Sans Thai';font-size:13.5px;background:#FCFAF3;}
+  .table-wrap{background:var(--white);border-radius:var(--radius-lg);border:1px solid var(--line-soft);box-shadow:var(--shadow-sm);overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  thead th{text-align:left;background:var(--cream-2);color:var(--navy-2);font-weight:600;font-size:11.5px;letter-spacing:.4px;padding:12px 14px;border-bottom:1px solid var(--line-soft);white-space:nowrap;}
+  tbody td{padding:12px 14px;border-bottom:1px solid var(--line-soft);vertical-align:top;}
+  tbody tr:last-child td{border-bottom:none;}
+  .sub{color:var(--muted);font-size:11.5px;}
+  .status-pill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11.5px;font-weight:600;}
+  .status-pill.found{background:var(--red-bg);color:var(--red);} .status-pill.notfound{background:var(--green-bg);color:var(--green);}
+  .dots{margin-top:6px;display:flex;gap:4px;}
+  .dots i{width:9px;height:9px;border-radius:50%;display:inline-block;}
+  .dots .n{background:var(--green);} .dots .f{background:var(--red);} .dots .x{background:#CFC9B8;}
+  .row-actions{display:flex;gap:6px;flex-wrap:wrap;white-space:nowrap;}
+  .row-actions button{background:none;color:var(--muted);font-size:12px;font-weight:600;padding:4px 6px;}
+  .row-actions button:hover{color:var(--navy);} .row-actions .pdf-dl{color:var(--amber-deep);} .row-actions .del:hover,.row-actions .del.yes{color:var(--red);}
+  .row-actions button:disabled{opacity:.5;}
+  .detail-row td{background:#FCFAF3;font-size:12.5px;}
+  .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .detail-grid h4{margin:0 0 4px;font-size:11.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--amber-deep);}
+  .detail-grid p{margin:0 0 8px;}
+  .empty-state{padding:40px 20px;text-align:center;color:var(--muted);font-size:13.5px;}
+  .highlight-flash{animation:flashRow 1.6s ease;} @keyframes flashRow{0%{background:#FBEBC9;}100%{background:transparent;}}
+
+  .sync-banner{border-radius:var(--radius-md);padding:11px 16px;font-size:12.5px;margin-bottom:14px;display:flex;align-items:flex-start;gap:10px;}
+  .sync-banner.warn{background:#FBF0DF;color:#7A4E12;border:1px solid #EFD8AC;}
+  .sync-banner.ok{background:var(--green-bg);color:#245C3D;border:1px solid #BFE0CC;}
+  .sync-banner.err{background:var(--red-bg);color:#7E2D26;border:1px solid #F0C6C1;}
+  .sync-banner .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:7px;}
+  .sync-banner.ok .dot{background:var(--green);} .sync-banner.warn .dot{background:var(--amber-deep);} .sync-banner.err .dot{background:var(--red);}
+
+  /* ---------- footer ---------- */
+  .footer{background:var(--navy);color:#fff;margin-top:50px;}
+  .footer-inner{display:grid;grid-template-columns:1.3fr 1fr;gap:24px;padding:34px 0;}
+  .hotline-num{font-family:'Kanit';font-size:30px;font-weight:700;} .hotline-num .k{color:var(--amber);}
+  .footer .label{font-size:12px;color:#B9C6D2;letter-spacing:1px;margin-bottom:6px;}
+  .footer .divider{border-left:1px solid rgba(255,255,255,0.15);padding-left:24px;}
+  .footer p{font-size:13px;color:#CBD6DF;margin:4px 0;} .office-name{font-weight:700;font-size:15px;margin-bottom:6px;}
+  .footer-bottom{border-top:1px solid rgba(255,255,255,0.1);padding:14px 0;text-align:center;font-size:11.5px;color:#8FA0AF;}
+
+  /* ---------- toast / banners / modal ---------- */
+  .toast{position:fixed;top:18px;left:50%;transform:translateX(-50%) translateY(-12px);z-index:2000;background:var(--navy);color:#fff;padding:12px 20px;border-radius:var(--radius-md);font-size:13.5px;font-weight:500;box-shadow:0 8px 24px rgba(16,33,51,0.25);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;max-width:92vw;}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);} .toast.err{background:var(--red);} .toast.ok{background:var(--green);}
+  .fatal-banner{display:none;position:sticky;top:0;z-index:1000;background:#7E2D26;color:#fff;padding:10px 18px;font-size:12.5px;text-align:center;}
+  .fatal-banner.show{display:block;}
+  .modal-overlay{position:fixed;inset:0;z-index:1500;background:rgba(16,23,33,0.6);backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .22s;}
+  .modal-overlay.show{opacity:1;pointer-events:auto;}
+  .modal-card{background:#fff;border-radius:20px;max-width:500px;width:100%;max-height:92vh;overflow:auto;box-shadow:0 24px 60px rgba(10,18,28,0.35);}
+  .modal-top{padding:22px 26px 18px;color:#fff;position:relative;}
+  .modal-top.found{background:linear-gradient(135deg,#C1483F,#8E2F28);} .modal-top.notfound{background:linear-gradient(135deg,#3D8B5F,#276A44);}
+  .modal-org-title{font-family:'Kanit';font-size:21px;font-weight:700;line-height:1.3;margin:2px 34px 8px 0;}
+  .modal-eyebrow{font-size:11px;letter-spacing:2px;opacity:.85;font-weight:600;}
+  .modal-status{font-family:'Kanit';font-size:24px;font-weight:700;margin-top:6px;display:flex;align-items:center;gap:10px;}
+  .modal-date{font-size:13px;margin-top:6px;opacity:.92;}
+  .modal-close{position:absolute;top:14px;right:16px;background:rgba(255,255,255,0.18);color:#fff;width:28px;height:28px;border-radius:50%;font-size:15px;}
+  .modal-body{padding:18px 26px 24px;}
+  .m-label{font-size:11px;letter-spacing:.6px;color:var(--muted);font-weight:600;margin:12px 0 3px;}
+  .m-label:first-child{margin-top:0;} .m-value{font-size:13.5px;line-height:1.6;}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;}
+  .chip{font-size:12px;font-weight:600;padding:3px 10px;border-radius:20px;}
+  .chip.n{background:var(--green-bg);color:#245C3D;} .chip.f{background:var(--red-bg);color:#7E2D26;} .chip.x{background:#EFEBDD;color:#8A8578;}
+  .modal-actions{display:flex;gap:10px;margin-top:18px;} .modal-actions button{flex:1;}
+
+  /* ---------- hidden PDF template ---------- */
+  #printRoot{position:fixed;top:0;left:-99999px;z-index:-1;}
+  .pdf-page{width:794px;background:#fff;color:#111;font-family:'Sarabun','Noto Sans Thai',sans-serif;padding:56px 60px;box-sizing:border-box;}
+  .pdf-title{text-align:center;font-weight:700;font-size:16px;margin:0 0 2px;} .pdf-sub{text-align:center;font-size:14px;margin:0 0 2px;}
+  .pdf-sub2{text-align:center;font-size:13px;margin:0 0 14px;color:#333;}
+  .pdf-page h4{font-family:'Sarabun';font-size:14px;font-weight:700;margin:16px 0 6px;border-bottom:1px solid #999;padding-bottom:4px;}
+  .pdf-page ol{margin:0 0 4px;padding-left:22px;font-size:12.5px;line-height:1.7;}
+  .pdf-field{font-size:13.5px;margin:5px 0;line-height:1.7;} .pdf-indent{padding-left:18px;} .pdf-block{margin-top:10px;}
+  .pdf-table{width:100%;border-collapse:collapse;font-size:12.5px;} .pdf-table td{border:1px solid #bbb;padding:4px 8px;vertical-align:top;}
+  .pdf-footer-note{margin-top:26px;font-size:11px;color:#666;text-align:right;}
+
+  @media(max-width:1100px){.province-board{grid-template-columns:repeat(3,1fr);}}
+  @media(max-width:920px){
+    .stats-row,.steps-grid{grid-template-columns:repeat(2,1fr);} .two-col,.footer-inner,.detail-grid{grid-template-columns:1fr;}
+    .form-top,.people-grid{grid-template-columns:1fr;} .footer .divider{border-left:none;padding-left:0;border-top:1px solid rgba(255,255,255,.15);padding-top:20px;}
+  }
+  @media(max-width:700px){.province-board{grid-template-columns:repeat(2,1fr);} .brand-text h1{font-size:22px;} .h-day{width:100%;}}
+  @media(max-width:430px){.province-board{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="fatal-banner" id="fatalBanner"></div>
+
+<div class="header">
+  <div class="wrap header-inner">
+    <div class="brand">
+      <div class="brand-badge">🛡️</div>
+      <div class="brand-text">
+        <div class="eyebrow">Environmental Protection Unit 3</div>
+        <h1>ศูนย์เฝ้าระวังข้อมูลข่าวสาร</h1>
+        <div class="sub">สำนักงานสิ่งแวดล้อมและควบคุมมลพิษที่ 3 — กรมควบคุมมลพิษ</div>
+      </div>
+    </div>
+    <div class="header-badges">
+      <div class="live-pill"><span class="live-dot"></span> เฝ้าระวังสด</div>
+      <div class="badge-24">24<span>ชม.</span></div>
+    </div>
+  </div>
+  <div class="ticker-outer"><div class="ticker-track" id="tickerTrack"></div></div>
+</div>
+
+<div class="wrap">
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-num" id="statTotal">0</div><div class="stat-label">รายงานทั้งหมด (รอบ)</div></div>
+    <div class="stat-card red"><div class="stat-num" id="statFound">0</div><div class="stat-label">รอบที่พบประเด็น</div></div>
+    <div class="stat-card green"><div class="stat-num" id="statNotFound">0</div><div class="stat-label">รอบที่ไม่พบประเด็น</div></div>
+    <div class="stat-card amber"><div class="stat-num">10</div><div class="stat-label">ช่องทางที่เฝ้าระวัง · 5 จังหวัด</div></div>
+  </div>
+</div>
+
+<!-- ===== สถานะรายจังหวัด ===== -->
+<section class="wrap">
+  <div class="section-head">
+    <div>
+      <h2 class="section-title">ผลการเฝ้าระวังรายจังหวัด</h2>
+      <p class="section-desc" id="boardCaption">—</p>
+    </div>
+  </div>
+  <div class="province-board" id="provinceBoard"></div>
+  <div class="hist">
+    <h3>ผลการรายงาน 7 วันล่าสุด (วันละ 3 รอบ)</h3>
+    <p class="hint">คลิกที่รอบเวลาเพื่อดูผลรายจังหวัดของรอบนั้นด้านบน</p>
+    <div id="historyGrid"></div>
+    <div class="legend">
+      <span><i style="background:#CDE6D6"></i>ไม่พบประเด็น</span>
+      <span><i style="background:#F2CFCA"></i>พบประเด็น</span>
+      <span><i style="background:#DAD5C4"></i>เลยเวลาแล้วยังไม่บันทึก</span>
+      <span><i style="background:#fff;border:1px dashed #C9BE9C"></i>ยังไม่ถึงเวลา</span>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 4 ขั้นตอน ===== -->
+<section class="wrap">
+  <div class="section-head"><div><h2 class="section-title">4 ขั้นตอนการปฏิบัติงาน</h2>
+    <p class="section-desc">กระบวนการเฝ้าระวังข้อมูลข่าวสารโซเชียลมีเดีย พื้นที่ สคพ.3</p></div></div>
+  <div class="steps-grid">
+    <div class="step-card"><div class="step-num">1</div><div class="step-icon">🔍</div><div class="step-title">ตรวจสอบข่าวสื่อ Social 24 ชม.</div><div class="step-desc">เฝ้าระวังเพจ/กลุ่มโซเชียลมีเดียในพื้นที่รับผิดชอบตลอด 24 ชั่วโมง</div></div>
+    <div class="step-card"><div class="step-num">2</div><div class="step-icon">📣</div><div class="step-title">แจ้งและมอบหมายผู้รับผิดชอบ</div><div class="step-desc">แจ้งประเด็นที่พบและมอบหมายเจ้าหน้าที่ผู้รับผิดชอบดำเนินการ</div></div>
+    <div class="step-card"><div class="step-num">3</div><div class="step-icon">🤝</div><div class="step-title">บูรณาการการทำงาน และแก้ไขปัญหา</div><div class="step-desc">ประสานหน่วยงานที่เกี่ยวข้องเพื่อตรวจสอบข้อเท็จจริงและแก้ไขปัญหา</div></div>
+    <div class="step-card"><div class="step-num">4</div><div class="step-icon">📝</div><div class="step-title">รายงาน ผอ.สคพ.3 / อคพ.</div><div class="step-desc">สื่อสารข้อเท็จจริงผ่านทาง Social media และ LINE OA (06.00 / 12.00 / 18.00 น.)</div></div>
+  </div>
+</section>
+
+<!-- ===== ช่องทาง + ฟอร์ม ===== -->
+<section class="wrap">
+  <div class="two-col">
+    <div class="panel">
+      <h3>ช่องทางที่เฝ้าระวัง</h3>
+      <p class="panel-sub">10 ช่องทาง · 5 จังหวัด</p>
+      <div id="channelsList"></div>
+    </div>
+
+    <div class="panel" id="formPanel">
+      <h3>บันทึกผลการตรวจสอบ</h3>
+      <p class="panel-sub">เลือกรอบเวลา → ติ๊กผลรายจังหวัด (ค่าเริ่มต้นคือ "ไม่พบประเด็น") → กดบันทึก ระบบจะส่งการ์ดเข้า LINE ตามเวลาให้อัตโนมัติ</p>
+
+      <div class="lockbox" id="lockBox" style="display:none;">
+        <div class="lock-icon">🔒</div>
+        <p>ส่วนนี้สำหรับเจ้าหน้าที่ — ผู้รับลิงก์ทั่วไปดูสถิติและผลรายงานได้ตามปกติ<br>กรอก PIN เจ้าหน้าที่เพื่อบันทึกผล</p>
+        <div class="lockrow">
+          <input type="password" id="pinInput" placeholder="PIN เจ้าหน้าที่" autocomplete="off" aria-label="PIN เจ้าหน้าที่">
+          <button type="button" class="btn-primary" id="unlockBtn">เข้าสู่ระบบ</button>
+        </div>
+        <div class="field-msg" id="pinMsg">PIN ไม่ถูกต้อง</div>
+      </div>
+
+      <div id="formBody">
+        <div class="form-top">
+          <div><label for="fDate">วันที่ตรวจสอบ</label><input type="date" id="fDate"></div>
+          <div><label>รอบเวลา</label><div class="seg" id="roundSeg"></div></div>
+        </div>
+        <div class="prow-head"><span>ผลการตรวจสอบรายจังหวัด</span><button type="button" class="linkbtn" id="allNoneBtn">ตั้งทุกจังหวัด: ไม่พบประเด็น</button></div>
+        <div id="provRows"></div>
+
+        <details class="people">
+          <summary>ผู้รายงาน / ผู้ตรวจสอบ (กรอกไว้ให้แล้ว แก้ไขได้)</summary>
+          <div class="people-grid">
+            <h4>ผู้รายงาน</h4>
+            <div><label for="rpName">ชื่อ-นามสกุล</label><input type="text" id="rpName"></div>
+            <div><label for="rpPosition">ตำแหน่ง</label><input type="text" id="rpPosition"></div>
+            <div><label for="rpPhone">เบอร์โทรศัพท์</label><input type="text" id="rpPhone"></div>
+            <div><label for="rpEmail">อีเมล</label><input type="text" id="rpEmail"></div>
+            <h4>ผู้ตรวจสอบ</h4>
+            <div><label for="rvName">ชื่อ-นามสกุล</label><input type="text" id="rvName"></div>
+            <div><label for="rvPosition">ตำแหน่ง</label><input type="text" id="rvPosition"></div>
+            <div><label for="rvAffiliation">สังกัด</label><input type="text" id="rvAffiliation"></div>
+            <div><label for="rvPhone">เบอร์โทรศัพท์</label><input type="text" id="rvPhone"></div>
+            <div style="grid-column:1/-1"><label for="rvEmail">อีเมล</label><input type="text" id="rvEmail"></div>
+          </div>
+        </details>
+
+        <button type="button" class="btn-primary btn-big" id="saveBtn">บันทึกผล</button>
+        <div style="text-align:center;margin-top:8px;"><button type="button" class="linkbtn" id="logoutBtn" style="display:none;">ออกจากโหมดเจ้าหน้าที่</button></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== ตารางบันทึก ===== -->
+<section class="wrap">
+  <div class="section-head">
+    <div><h2 class="section-title">บันทึกรายงานทั้งหมด</h2><p class="section-desc" id="logDesc">—</p></div>
+    <button type="button" class="btn-secondary" id="refreshBtn">↻ รีเฟรชข้อมูลล่าสุด</button>
+  </div>
+  <div class="sync-banner" id="syncBanner" style="display:none;"></div>
+  <div class="log-controls">
+    <input type="text" id="searchInput" placeholder="ค้นหาวันที่ / ผู้รายงาน / รายละเอียด...">
+    <select id="statusFilter"><option value="all">ทุกสถานะ</option><option value="found">พบประเด็น</option><option value="notfound">ไม่พบประเด็น</option></select>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>วันที่ / รอบเวลา</th><th>ผลตรวจสอบ</th><th>ข้อเท็จจริงโดยย่อ</th><th>ผู้รายงาน</th><th>วันที่รายงาน</th><th></th></tr></thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+    <div class="empty-state" id="emptyState" style="display:none;">ยังไม่มีรายงาน — เจ้าหน้าที่บันทึกผลรอบแรกได้จากแบบฟอร์มด้านบน</div>
+  </div>
+</section>
+
+<div class="footer">
+  <div class="wrap footer-inner">
+    <div><div class="label">สายด่วนแจ้งเหตุฉุกเฉินสารเคมี</div><div class="hotline-num">โทร <span class="k">1650</span> กด 3</div><p>กรมควบคุมมลพิษ พร้อมรับแจ้งเหตุตลอด 24 ชั่วโมง</p></div>
+    <div class="divider"><div class="office-name">สคพ. 3 (พิษณุโลก)</div><p>พื้นที่รับผิดชอบ: พิษณุโลก ตาก อุตรดิตถ์ สุโขทัย เพชรบูรณ์</p><p>โทร. 055-313146, 055-313147</p><p>FB: สำนักงานสิ่งแวดล้อมและควบคุมมลพิษที่ 3</p></div>
+  </div>
+  <div class="footer-bottom">หน่วยพิทักษ์สิ่งแวดล้อมที่ 3 สคพ.3 — จัดทำเพื่อการสื่อสารภายในหน่วยงาน</div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div id="printRoot"><div class="pdf-page" id="pdfPage"></div></div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-card">
+    <div class="modal-top" id="modalTop">
+      <button class="modal-close" id="modalClose" aria-label="ปิด">✕</button>
+      <div class="modal-org-title">ศูนย์เฝ้าระวังข้อมูลข่าวสาร พื้นที่ สคพ.3</div>
+      <div class="modal-eyebrow">สรุปผลรายงานล่าสุด</div>
+      <div class="modal-status"><span id="mIcon"></span><span id="mStatus"></span></div>
+      <div class="modal-date" id="mDate"></div>
+    </div>
+    <div class="modal-body">
+      <div id="mChipsBox"><div class="m-label">ผลรายจังหวัด</div><div class="chips" id="mChips"></div></div>
+      <div class="m-label">ข้อเท็จจริง</div><div class="m-value" id="mFact"></div>
+      <div class="m-label">การปฏิบัติ (Action)</div><div class="m-value" id="mAction"></div>
+      <div class="m-label">ผู้รายงาน</div><div class="m-value" id="mReporter"></div>
+      <div class="modal-actions"><button class="btn-secondary" id="mDismiss">ปิดหน้าต่างนี้</button><button class="btn-primary" id="mView">เข้าดูรายละเอียด</button></div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+(function(){
+  "use strict";
+
+  // ============================================================
+  // วาง Web App URL (ลงท้าย /exec) จาก Apps Script ไว้ระหว่างเครื่องหมายคำพูด
+  // ถ้าเว้นว่าง จะเก็บข้อมูลไว้ในเบราว์เซอร์เครื่องนี้เท่านั้น
+  // ============================================================
+  var SHEETS_API_URL = "https://script.google.com/macros/s/AKfycbzzUE2I1MocgXdsstWWP6Nlg3O8REAppwaTqaPJX_Z2Ffnim-y_pBQH8Y2zl4VW0MP9/exec";
+  var REMOTE = /^https:\/\//.test(SHEETS_API_URL);
+
+  function $(id){ return document.getElementById(id); }
+  function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+  function sleep(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
+
+  var fatal = $("fatalBanner");
+  function showFatal(msg){ fatal.textContent = "เกิดข้อผิดพลาดในหน้านี้: " + msg; fatal.className = "fatal-banner show"; }
+  window.addEventListener("error", function(e){ showFatal(e.message || ""); });
+  window.addEventListener("unhandledrejection", function(e){ showFatal(String(e.reason && e.reason.message ? e.reason.message : e.reason)); });
+
+  // ---------- ข้อมูลอ้างอิง ----------
+  var ROUNDS = [
+    {key:"06:00", label:"06.00 น.", min:360},
+    {key:"12:00", label:"12.00 น.", min:720},
+    {key:"18:00", label:"18.00 น.", min:1080}
+  ];
+  var PROVINCES = [
+    {name:"พิษณุโลก", channels:[
+      {name:"พิษณุโลกบ้านเรา", type:"กลุ่ม", url:"https://www.facebook.com/groups/166825805528810"},
+      {name:"Phitsanulok Hotnews", type:"เพจ", url:"https://www.facebook.com/phitsanulokhotnews/"}]},
+    {name:"ตาก", channels:[
+      {name:"Tak city", type:"กลุ่ม", url:"https://www.facebook.com/groups/TakCity/"},
+      {name:"จังหวัด ตาก", type:"เพจ", url:"https://www.facebook.com/"}]},
+    {name:"อุตรดิตถ์", channels:[
+      {name:"อุตรดิตถ์ 24 ชั่วโมง", type:"เพจ", url:"https://www.facebook.com/ut24hrs/"},
+      {name:"อุตรดิตถ์บ้านเรา", type:"กลุ่ม", url:"https://www.facebook.com/groups/utthome/"}]},
+    {name:"สุโขทัย", channels:[
+      {name:"คนสุโขทัย หัวใจบ้านๆ", type:"กลุ่ม", url:"https://www.facebook.com/groups/253940131481787/"},
+      {name:"สุโขทัยรายวัน | Sukhothai Thani", type:"เพจ", url:"https://www.facebook.com/Sukhothaidaily/"}]},
+    {name:"เพชรบูรณ์", channels:[
+      {name:"รวมข่าวแชร์ เพชรบูรณ์", type:"กลุ่ม", url:"https://www.facebook.com/groups/sharephetchabun"},
+      {name:"เพชรบูรณ์", type:"เพจ", url:"https://www.facebook.com/"}]}
+  ];
+  var DEFAULT_PEOPLE = {
+    rpName:"นายพิสิษฐ์ ศรีกัลยานิวาท", rpPosition:"นักวิชาการสิ่งแวดล้อมชำนาญการพิเศษ", rpPhone:"09-8361-9454", rpEmail:"epo03@pcd.go.th",
+    rvName:"นายสรายุธ บุญขัน", rvPosition:"ผู้อำนวยการสำนักงานสิ่งแวดล้อมและควบคุมมลพิษที่ 3 (พิษณุโลก)", rvAffiliation:"กรมควบคุมมลพิษ", rvPhone:"08-6673-8475", rvEmail:"epo03@pcd.go.th"
+  };
+  var PEOPLE_IDS = Object.keys(DEFAULT_PEOPLE);
+  var LS_KEY = "epo3_reports_v2", LS_PREFS = "epo3_prefs_v2", SS_PIN = "epo3_pin";
+
+  var TH_MONTHS = ["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
+  var TH_SHORT = ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
+
+  var state = {reports:[], pinRequired:REMOTE, unlocked:false, pin:"", selectedId:null, sig:"", saving:false};
+  function canEdit(){ return !REMOTE || !state.pinRequired || state.unlocked; }
+
+  // ---------- ตัวช่วยวันที่/รอบ ----------
+  function pad(n){ return (n < 10 ? "0" : "") + n; }
+  function isoOf(d){ return d.getFullYear() + "-" + pad(d.getMonth()+1) + "-" + pad(d.getDate()); }
+  function thaiFromISO(iso){ var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || ""); return m ? (+m[3]) + " " + TH_MONTHS[+m[2]-1] + " " + (+m[1] + 543) : (iso || "-"); }
+  function shortFromISO(iso){ var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || ""); return m ? (+m[3]) + " " + TH_SHORT[+m[2]-1] : (iso || ""); }
+  function roundLabel(k){ for(var i=0;i<ROUNDS.length;i++){ if(ROUNDS[i].key === k) return ROUNDS[i].label; } return k || ""; }
+  function defaultRoundKey(){ var d = new Date(), m = d.getHours()*60 + d.getMinutes(); return m < 540 ? "06:00" : (m < 900 ? "12:00" : "18:00"); }
+  function normRound(v){ var m = /(\d{1,2})[:.](\d{2})/.exec(String(v == null ? "" : v)); return m ? pad(+m[1]) + ":" + m[2] : ""; }
+  function parsePR(v){ if(!v) return null; if(typeof v === "object") return v; try{ var o = JSON.parse(v); return (o && typeof o === "object") ? o : null; }catch(e){ return null; } }
+  // ซ่อมวันที่ที่ Google Sheets แปลงเป็น Date เอง (เช่น "2569-11-14T17:00:00.000Z" = 15 พ.ย. 2569)
+  function repairThaiDate(v){
+    if(!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(String(v || ""))) return v;
+    var t = new Date(String(v));
+    if(isNaN(t.getTime())) return v;
+    var l = new Date(t.getTime() + 7*3600*1000); // เวลาไทย
+    return l.getUTCDate() + " " + TH_MONTHS[l.getUTCMonth()] + " " + l.getUTCFullYear();
+  }
+  function normReport(r){
+    var fixed = repairThaiDate(r.checkDate);
+    if(fixed !== r.checkDate && !/^\d{4}-\d{2}-\d{2}$/.test(String(r.dateISO || ""))){
+      var mm = /^(\d+) (\S+) (\d{4})$/.exec(fixed);
+      if(mm){ var mi = TH_MONTHS.indexOf(mm[2]) + 1, y = Number(mm[3]); if(y > 2400) y -= 543;
+        r.dateISO = y + "-" + pad(mi) + "-" + pad(+mm[1]); }
+    }
+    r.checkDate = fixed;
+    r.reportDate = repairThaiDate(r.reportDate);
+    r.createdAt = Number(r.createdAt) || 0;
+    r.status = r.status === "found" ? "found" : "notfound";
+    r.round = normRound(r.round);
+    r.dateISO = /^\d{4}-\d{2}-\d{2}$/.test(String(r.dateISO || "")) ? r.dateISO : "";
+    r.pr = parsePR(r.provinceResults);
+    return r;
+  }
+  function roundText(r){ return r.round ? roundLabel(r.round) : (r.checkTime || ""); }
+
+  // ---------- storage ----------
+  function lsGet(k){ try{ var v = window.localStorage.getItem(k); return v ? JSON.parse(v) : null; }catch(e){ return null; } }
+  function lsSet(k,v){ try{ window.localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+  function ssGet(k){ try{ return window.sessionStorage.getItem(k) || ""; }catch(e){ return ""; } }
+  function ssSet(k,v){ try{ if(v) window.sessionStorage.setItem(k, v); else window.sessionStorage.removeItem(k); }catch(e){} }
+
+  // ---------- JSONP (อ่านข้อมูลจาก Apps Script โดยไม่ติด CORS) ----------
+  function jsonp(params){
+    return new Promise(function(resolve, reject){
+      var cb = "epo3_cb_" + Date.now() + "_" + Math.floor(Math.random()*1000000);
+      var script = document.createElement("script"), done = false;
+      var timer = setTimeout(function(){ if(done) return; done = true; cleanup(); reject(new Error("หมดเวลาเชื่อมต่อ (เกิน 15 วินาที)")); }, 15000);
+      function cleanup(){ clearTimeout(timer); try{ delete window[cb]; }catch(e){ window[cb] = undefined; } if(script.parentNode) script.parentNode.removeChild(script); }
+      window[cb] = function(data){ if(done) return; done = true; cleanup(); resolve(data); };
+      var qs = Object.keys(params).map(function(k){ return encodeURIComponent(k) + "=" + encodeURIComponent(params[k] == null ? "" : params[k]); }).join("&");
+      script.src = SHEETS_API_URL + (SHEETS_API_URL.indexOf("?") > -1 ? "&" : "?") + qs + (qs ? "&" : "") + "callback=" + cb;
+      script.onerror = function(){ if(done) return; done = true; cleanup(); reject(new Error("โหลดข้อมูลจาก URL ไม่สำเร็จ")); };
+      document.body.appendChild(script);
+    });
+  }
+  async function fetchList(){
+    var d = await jsonp({});
+    if(!d || d.ok === false) throw new Error((d && d.error) || "รูปแบบข้อมูลไม่ถูกต้อง");
+    return {reports:(d.reports || []).map(normReport), pinRequired:d.pinRequired === true, version:d.version || 1};
+  }
+  async function addRemote(entry){
+    // ส่งแบบ POST (ข้อความยาวได้ ไม่ติดข้อจำกัดความยาว URL) แล้วตรวจซ้ำว่าเข้าฐานข้อมูลจริง
+    await fetch(SHEETS_API_URL, {method:"POST", mode:"no-cors", headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify({action:"add", pin:state.pin, report:entry})});
+    for(var i=0;i<4;i++){
+      await sleep(i === 0 ? 1300 : 1800);
+      var res = await fetchList();
+      if(res.reports.some(function(r){ return r.id === entry.id; })){ state.reports = res.reports; cacheReports(); return; }
+    }
+    throw new Error("ส่งข้อมูลแล้วแต่ไม่พบในฐานข้อมูล — ตรวจสอบ PIN เจ้าหน้าที่ และว่า Deploy Code.gs เวอร์ชันล่าสุดแล้ว");
+  }
+  async function deleteRemote(id){
+    var d = await jsonp({action:"delete", id:id, pin:state.pin});
+    if(!d || d.ok === false) throw new Error((d && d.error) || "ลบไม่สำเร็จ");
+  }
+  function cacheReports(){ lsSet(LS_KEY, {reports:state.reports.map(function(r){ var c = {}; for(var k in r){ if(k !== "pr") c[k] = r[k]; } return c; })}); }
+
+  // ---------- UI helpers ----------
+  var toastTimer = null;
+  function showToast(kind, msg, ms){
+    var t = $("toast"); t.textContent = msg; t.className = "toast show " + (kind || "");
+    if(toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ t.className = "toast " + (kind || ""); }, ms || 3000);
+  }
+  function showSync(kind, msg){
+    var b = $("syncBanner"); b.textContent = "";
+    var dot = document.createElement("span"); dot.className = "dot";
+    var tx = document.createElement("span"); tx.textContent = msg;
+    b.appendChild(dot); b.appendChild(tx); b.className = "sync-banner " + kind; b.style.display = "flex";
+  }
+
+  // ---------- โหลดข้อมูล ----------
+  async function loadReports(){
+    if(!REMOTE){
+      var c = lsGet(LS_KEY);
+      state.reports = ((c && c.reports) || []).map(normReport); state.pinRequired = false;
+      $("logDesc").textContent = "ประวัติรายงานการตรวจสอบสื่อโซเชียล — บันทึกไว้เฉพาะเบราว์เซอร์นี้";
+      showSync("warn", "ยังไม่ได้เชื่อมต่อฐานข้อมูลกลาง — ผู้รับลิงก์จะไม่เห็นรายงานที่เพิ่มใหม่ และระบบจะยังไม่ส่งการ์ดเข้า LINE");
+      return;
+    }
+    $("logDesc").textContent = "ประวัติรายงานการตรวจสอบสื่อโซเชียล — ข้อมูลกลาง ทุกคนที่ได้รับลิงก์เห็นชุดเดียวกัน";
+    try{
+      var res = await fetchList();
+      state.reports = res.reports; state.pinRequired = res.pinRequired; cacheReports();
+      if(res.version < 2) showSync("warn", "ฐานข้อมูลยังเป็น Code.gs เวอร์ชันเก่า — กรุณาอัปเดตโค้ดและ Deploy เวอร์ชันใหม่ เพื่อให้บันทึกผลรายจังหวัดและส่ง LINE ได้");
+      else showSync("ok", "เชื่อมต่อฐานข้อมูลกลางสำเร็จ — ข้อมูลนี้เป็นข้อมูลล่าสุดที่ทุกคนเห็นตรงกัน");
+    }catch(err){
+      var c2 = lsGet(LS_KEY);
+      state.reports = ((c2 && c2.reports) || []).map(normReport);
+      showSync("err", "เชื่อมต่อฐานข้อมูลกลางไม่สำเร็จ (" + (err && err.message ? err.message : err) + ") — แสดงข้อมูลที่เก็บไว้ล่าสุดในเครื่องนี้ ตรวจสอบว่า Deploy เป็น \"Anyone\" และ URL ลงท้าย /exec");
+    }
+  }
+  async function refresh(showBanner){
+    if(state.saving) return;
+    try{
+      if(REMOTE){
+        var res = await fetchList();
+        var sig = JSON.stringify(res.reports.map(function(r){ return r.id + ":" + r.createdAt; }));
+        state.pinRequired = res.pinRequired;
+        if(sig !== state.sig || showBanner){ state.reports = res.reports; cacheReports(); renderAll(); }
+        if(showBanner) showSync(res.version < 2 ? "warn" : "ok", res.version < 2 ? "ฐานข้อมูลยังเป็น Code.gs เวอร์ชันเก่า — กรุณาอัปเดตโค้ดและ Deploy ใหม่" : "อัปเดตข้อมูลล่าสุดแล้ว — เชื่อมต่อฐานข้อมูลกลางปกติ");
+      }else{
+        var c = lsGet(LS_KEY); state.reports = ((c && c.reports) || []).map(normReport); renderAll();
+      }
+    }catch(err){
+      if(showBanner) showSync("err", "รีเฟรชไม่สำเร็จ (" + (err && err.message ? err.message : err) + ")");
+    }
+  }
+
+  // ---------- เลือกรายงานที่แสดงบนการ์ด ----------
+  function sorted(){ return state.reports.slice().sort(function(a,b){ return (b.createdAt||0) - (a.createdAt||0); }); }
+  function findRep(iso, round){
+    var l = sorted().filter(function(r){ return r.dateISO === iso && r.round === round; });
+    return l[0] || null;
+  }
+  function currentReport(){
+    var l = sorted();
+    if(state.selectedId){ var f = l.filter(function(r){ return r.id === state.selectedId; })[0]; if(f) return f; }
+    return l.filter(function(r){ return r.pr; })[0] || l[0] || null;
+  }
+
+  // ---------- render: ช่องทาง / ticker ----------
+  function renderChannels(){
+    $("channelsList").innerHTML = PROVINCES.map(function(p){
+      return '<div class="province-group"><div class="province-name">' + esc(p.name) + '</div>' + p.channels.map(function(c){
+        return '<a class="channel-item" href="' + esc(c.url) + '" target="_blank" rel="noopener"><span class="cname">' + esc(c.name) + '</span><span class="ctype">' + c.type + '</span><span class="go">↗</span></a>';
+      }).join("") + '</div>';
+    }).join("");
+    var items = [].concat.apply([], PROVINCES.map(function(p){ return p.channels; })).map(function(c){ return '<div class="ticker-item"><span class="ticker-dot"></span>' + esc(c.name) + '</div>'; }).join("");
+    $("tickerTrack").innerHTML = items + items;
+  }
+
+  // ---------- render: สถิติ / การ์ด / ประวัติ ----------
+  function renderStats(){
+    var f = state.reports.filter(function(r){ return r.status === "found"; }).length;
+    $("statTotal").textContent = state.reports.length; $("statFound").textContent = f; $("statNotFound").textContent = state.reports.length - f;
+  }
+  function cardHtml(p, res, rep){
+    var s = res && (res.s === "f" || res.s === "n") ? res.s : "x";
+    var label = s === "f" ? "⚠️ พบประเด็น" : (s === "n" ? "✅ ไม่พบประเด็น" : "➖ ไม่มีข้อมูล");
+    var when = (rep.dateISO ? thaiFromISO(rep.dateISO) : (rep.checkDate || "")) + " · รอบ " + roundText(rep);
+    var body = '<div class="plabel">ช่องทางที่เฝ้าระวัง</div><div class="pdetail">' + p.channels.map(function(c){ return esc(c.name) + " (" + c.type + ")"; }).join("<br>") + '</div>';
+    if(s === "f" && res.d) body += '<div class="plabel">รายละเอียดที่พบ</div><div class="pdetail">' + esc(res.d) + '</div>';
+    if(s === "f" && res.a) body += '<div class="plabel">การปฏิบัติ (Action)</div><div class="pdetail">' + esc(res.a) + '</div>';
+    return '<div class="pcard"><div class="pcard-head"><div class="org">ศูนย์เฝ้าระวังข้อมูลข่าวสาร สคพ.3</div><div class="pname">จังหวัด' + esc(p.name) + '</div><div class="pwhen">' + esc(when) + '</div></div>' +
+           '<div class="pcard-status ' + s + '">' + label + '</div><div class="pcard-body">' + body + '</div></div>';
+  }
+  function renderBoard(){
+    var rep = currentReport(), box = $("provinceBoard");
+    if(!rep){
+      box.innerHTML = '<div class="board-note">ยังไม่มีรายงาน — เมื่อเจ้าหน้าที่บันทึกผลรอบแรก การ์ดรายจังหวัดจะแสดงที่นี่</div>';
+      $("boardCaption").textContent = "การ์ดสถานะรายจังหวัด (รูปแบบเดียวกับที่ส่งเข้า LINE OA)";
+    }else{
+      $("boardCaption").textContent = "รอบ " + roundText(rep) + " · " + (rep.checkDate || thaiFromISO(rep.dateISO)) + " · การ์ดรูปแบบเดียวกับที่ส่งเข้า LINE OA";
+      if(rep.pr){
+        box.innerHTML = PROVINCES.map(function(p){ return cardHtml(p, rep.pr[p.name], rep); }).join("");
+      }else{
+        box.innerHTML = '<div class="board-note">รายงานฉบับนี้บันทึกด้วยรูปแบบเดิม (ไม่แยกรายจังหวัด) — ผลรวม: <b>' + (rep.status === "found" ? "พบประเด็น" : "ไม่พบประเด็น") + '</b><br><span class="sub">' + esc(rep.factDetail || "") + '</span></div>';
+      }
+    }
+    renderHistory(rep);
+  }
+  function renderHistory(sel){
+    var now = new Date(), nowMin = now.getHours()*60 + now.getMinutes(), todayIso = isoOf(now), html = "";
+    for(var i=0;i<7;i++){
+      var d = new Date(); d.setDate(d.getDate() - i); var iso = isoOf(d);
+      html += '<div class="h-row"><div class="h-day">' + shortFromISO(iso) + (i === 0 ? " (วันนี้)" : "") + '</div>' + ROUNDS.map(function(r){
+        var rep = findRep(iso, r.key), c, txt = r.label;
+        if(rep){ c = rep.status === "found" ? "f" : "n"; txt += rep.status === "found" ? " · พบประเด็น" : " · ไม่พบ"; }
+        else if(iso === todayIso && nowMin < r.min){ c = "w"; txt += " · รอ"; }
+        else{ c = "x"; txt += " · ไม่มีบันทึก"; }
+        return '<button type="button" class="h-cell ' + c + (rep && sel && rep.id === sel.id ? " sel" : "") + '"' + (rep ? ' data-id="' + esc(rep.id) + '"' : " disabled") + '>' + esc(txt) + '</button>';
+      }).join("") + '</div>';
+    }
+    $("historyGrid").innerHTML = html;
+    Array.prototype.forEach.call($("historyGrid").querySelectorAll(".h-cell[data-id]"), function(b){
+      b.addEventListener("click", function(){ state.selectedId = b.getAttribute("data-id"); renderBoard(); });
+    });
+  }
+
+  // ---------- render: ตาราง ----------
+  function dotsHtml(r){
+    if(!r.pr) return "";
+    return '<div class="dots">' + PROVINCES.map(function(p){ var x = r.pr[p.name]; return '<i class="' + (x && x.s ? x.s : "x") + '" title="' + esc(p.name) + '"></i>'; }).join("") + '</div>';
+  }
+  function detailHtml(r){
+    var prh = "";
+    if(r.pr){
+      prh = '<h4>ผลรายจังหวัด</h4>' + PROVINCES.map(function(p){
+        var x = r.pr[p.name] || {};
+        return '<p><b>' + esc(p.name) + ':</b> ' + (x.s === "f" ? "⚠️ พบประเด็น" : (x.s === "n" ? "✅ ไม่พบประเด็น" : "-")) + (x.d ? " — " + esc(x.d) : "") + (x.a ? ' <i>(ปฏิบัติ: ' + esc(x.a) + ')</i>' : "") + '</p>';
+      }).join("");
+    }
+    return '<div class="detail-grid"><div>' + prh + '<h4>ข้อเท็จจริง</h4><p>' + esc(r.factDetail || "-") + '</p><h4>การปฏิบัติ (Action)</h4><p>' + esc(r.actionDetail || "-") + '</p></div>' +
+      '<div><h4>ผู้รายงาน</h4><p>' + esc(r.reporterName || "-") + ' — ' + esc(r.reporterPosition || "-") + '<br>' + esc(r.reporterPhone || "") + ' · ' + esc(r.reporterEmail || "") + '</p>' +
+      '<h4>ผู้ตรวจสอบ</h4><p>' + esc(r.reviewerName || "-") + ' — ' + esc(r.reviewerPosition || "-") + '<br>' + esc(r.reviewerAffiliation || "") + '<br>' + esc(r.reviewerPhone || "") + ' · ' + esc(r.reviewerEmail || "") + '</p></div></div>';
+  }
+  function renderTable(){
+    var q = ($("searchInput").value || "").trim().toLowerCase(), sf = $("statusFilter").value;
+    var list = sorted().filter(function(r){
+      if(sf !== "all" && r.status !== sf) return false;
+      return !q || [r.checkDate, roundText(r), r.reporterName, r.factDetail, r.actionDetail, r.reviewerName].join(" ").toLowerCase().indexOf(q) !== -1;
+    });
+    var tb = $("tableBody");
+    if(!list.length){ tb.innerHTML = ""; $("emptyState").style.display = "block"; return; }
+    $("emptyState").style.display = "none";
+    var edit = canEdit(), rows = "";
+    list.forEach(function(r){
+      var id = esc(r.id), found = r.status === "found";
+      var fs = String(r.factDetail || "-"); fs = fs.length > 70 ? fs.slice(0,70) + "…" : fs;
+      rows += '<tr class="report-row" data-id="' + id + '"><td>' + esc(r.checkDate || thaiFromISO(r.dateISO)) + '<br><span class="sub">' + esc(roundText(r)) + '</span></td>' +
+        '<td><span class="status-pill ' + (found ? "found" : "notfound") + '">' + (found ? "พบประเด็น" : "ไม่พบประเด็น") + '</span>' + dotsHtml(r) + '</td>' +
+        '<td>' + esc(fs) + '</td><td>' + esc(r.reporterName || "-") + '</td><td>' + esc(r.reportDate || "-") + '</td>' +
+        '<td class="row-actions"><button class="toggle" data-id="' + id + '">รายละเอียด ▾</button><button class="pdf-dl" data-id="' + id + '">⬇ PDF</button>' + (edit ? '<button class="del" data-id="' + id + '">ลบ</button>' : "") + '</td></tr>' +
+        '<tr class="detail-row" id="detail-' + id + '" style="display:none;"><td colspan="6">' + detailHtml(r) + '</td></tr>';
+    });
+    tb.innerHTML = rows;
+    Array.prototype.forEach.call(tb.querySelectorAll(".toggle"), function(b){
+      b.addEventListener("click", function(){
+        var row = $("detail-" + b.getAttribute("data-id")), open = row.style.display !== "none";
+        row.style.display = open ? "none" : "table-row"; b.textContent = open ? "รายละเอียด ▾" : "ซ่อนรายละเอียด ▴";
+      });
+    });
+    Array.prototype.forEach.call(tb.querySelectorAll(".pdf-dl"), function(b){
+      b.addEventListener("click", async function(){
+        var rep = state.reports.filter(function(r){ return r.id === b.getAttribute("data-id"); })[0]; if(!rep) return;
+        var old = b.textContent; b.textContent = "กำลังสร้าง..."; b.disabled = true;
+        try{ await downloadPdf(rep); showToast("ok", "ดาวน์โหลดไฟล์ PDF แล้ว"); }
+        catch(err){ showToast("err", "สร้างไฟล์ PDF ไม่สำเร็จ: " + (err && err.message ? err.message : err), 4500); }
+        finally{ b.textContent = old; b.disabled = false; }
+      });
+    });
+    Array.prototype.forEach.call(tb.querySelectorAll(".del"), function(b){
+      b.addEventListener("click", async function(){
+        var id = b.getAttribute("data-id");
+        if(b.getAttribute("data-confirm") !== "1"){
+          b.setAttribute("data-confirm", "1"); b.textContent = "ยืนยันลบ?"; b.classList.add("yes");
+          setTimeout(function(){ if(b.isConnected){ b.removeAttribute("data-confirm"); b.textContent = "ลบ"; b.classList.remove("yes"); } }, 3000);
+          return;
+        }
+        try{
+          if(REMOTE) await deleteRemote(id);
+          state.reports = state.reports.filter(function(r){ return r.id !== id; });
+          cacheReports();
+          showToast("ok", "ลบรายงานแล้ว");
+        }catch(err){ showToast("err", "ลบไม่สำเร็จ: " + (err && err.message ? err.message : err), 4500); }
+        renderAll();
+      });
+    });
+  }
+
+  function renderAll(){
+    state.sig = JSON.stringify(state.reports.map(function(r){ return r.id + ":" + r.createdAt; }));
+    renderStats(); renderBoard(); renderTable(); applyEditorState();
+  }
+
+  // ---------- โหมดเจ้าหน้าที่ (PIN) ----------
+  function applyEditorState(){
+    var ok = canEdit();
+    $("formBody").style.display = ok ? "" : "none";
+    $("lockBox").style.display = ok ? "none" : "";
+    $("logoutBtn").style.display = (REMOTE && state.pinRequired && state.unlocked) ? "" : "none";
+  }
+  async function tryUnlock(pin, silent){
+    try{
+      var d = await jsonp({action:"verify", pin:pin});
+      if(d && d.ok && d.valid){ state.unlocked = true; state.pin = pin; ssSet(SS_PIN, pin); $("pinMsg").classList.remove("show"); applyEditorState(); renderTable(); if(!silent) showToast("ok", "เข้าสู่โหมดเจ้าหน้าที่แล้ว"); return true; }
+      if(!silent) $("pinMsg").classList.add("show");
+    }catch(err){ if(!silent) showToast("err", "ตรวจสอบ PIN ไม่สำเร็จ: " + (err && err.message ? err.message : err), 4500); }
+    return false;
+  }
+
+  // ---------- ฟอร์ม ----------
+  function buildForm(){
+    $("fDate").value = isoOf(new Date());
+    var def = defaultRoundKey();
+    $("roundSeg").innerHTML = ROUNDS.map(function(r){ return '<label><input type="radio" name="round" value="' + r.key + '"' + (r.key === def ? " checked" : "") + '><span>' + r.label + '</span></label>'; }).join("");
+    $("provRows").innerHTML = PROVINCES.map(function(p, i){
+      return '<div class="prow"><div class="prow-top"><div class="prow-name">' + esc(p.name) + '<small>' + p.channels.map(function(c){ return esc(c.name); }).join(" · ") + '</small></div>' +
+        '<div class="seg tog"><label><input type="radio" name="st_' + i + '" value="n" checked><span>ไม่พบประเด็น</span></label><label><input type="radio" name="st_' + i + '" value="f"><span>พบประเด็น</span></label></div></div>' +
+        '<div class="prow-more" id="pm_' + i + '"><label for="pd_' + i + '">รายละเอียดที่พบ (ลิงก์ / ข้อความโพสต์)</label><textarea id="pd_' + i + '"></textarea>' +
+        '<div class="field-msg" id="pe_' + i + '">กรุณาระบุรายละเอียดที่พบ</div><label for="pa_' + i + '">การปฏิบัติ (Action)</label><input type="text" id="pa_' + i + '"></div></div>';
+    }).join("");
+    var prefs = lsGet(LS_PREFS) || {};
+    PEOPLE_IDS.forEach(function(id){ $(id).value = prefs[id] != null ? prefs[id] : DEFAULT_PEOPLE[id]; });
+    $("provRows").addEventListener("change", function(e){
+      var n = e.target && e.target.name;
+      if(n && n.indexOf("st_") === 0){ $("pm_" + n.slice(3)).classList.toggle("show", e.target.value === "f"); }
+    });
+    $("allNoneBtn").addEventListener("click", resetProvinces);
+    document.addEventListener("change", updateSaveLabel);
+    updateSaveLabel();
+  }
+  function resetProvinces(){
+    PROVINCES.forEach(function(p, i){
+      document.querySelector('input[name="st_' + i + '"][value="n"]').checked = true;
+      $("pm_" + i).classList.remove("show"); $("pd_" + i).value = ""; $("pa_" + i).value = "";
+      $("pd_" + i).classList.remove("field-error"); $("pe_" + i).classList.remove("show");
+    });
+  }
+  function selectedRound(){ var r = document.querySelector('input[name="round"]:checked'); return r ? r.value : ""; }
+  function updateSaveLabel(){ $("saveBtn").textContent = "บันทึกผลรอบ " + roundLabel(selectedRound()); }
+
+  function collect(){
+    var iso = $("fDate").value, round = selectedRound();
+    if(!iso){ showToast("err", "กรุณาเลือกวันที่ตรวจสอบ"); $("fDate").focus(); return null; }
+    if(!round){ showToast("err", "กรุณาเลือกรอบเวลา"); return null; }
+    var pr = {}, foundList = [], actions = [], bad = false;
+    PROVINCES.forEach(function(p, i){
+      var s = document.querySelector('input[name="st_' + i + '"]:checked').value;
+      var d = $("pd_" + i).value.trim(), a = $("pa_" + i).value.trim();
+      $("pd_" + i).classList.remove("field-error"); $("pe_" + i).classList.remove("show");
+      if(s === "f" && !d){ bad = true; $("pd_" + i).classList.add("field-error"); $("pe_" + i).classList.add("show"); }
+      pr[p.name] = {s:s, d:s === "f" ? d : "", a:s === "f" ? a : ""};
+      if(s === "f"){ foundList.push(p.name + (d ? " — " + d : "")); if(a) actions.push(p.name + ": " + a); }
+    });
+    if(bad){ showToast("err", "กรุณาระบุรายละเอียดของจังหวัดที่พบประเด็น"); return null; }
+    var any = foundList.length > 0, th = thaiFromISO(iso);
+    return {
+      id:"r-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7),
+      checkDate:th, checkTime:roundLabel(round), status:any ? "found" : "notfound",
+      factDetail:any ? "พบประเด็น " + foundList.length + " จังหวัด: " + foundList.join(" | ") : "ไม่พบว่ามีการโพสต์ที่เกี่ยวข้องกับ สำนักงานสิ่งแวดล้อมและควบคุมมลพิษที่ 3 ในทั้ง 5 จังหวัด",
+      actionDetail:actions.length ? actions.join(" | ") : "-",
+      reporterName:$("rpName").value.trim(), reporterPosition:$("rpPosition").value.trim(), reporterPhone:$("rpPhone").value.trim(), reporterEmail:$("rpEmail").value.trim(),
+      reviewerName:$("rvName").value.trim(), reviewerPosition:$("rvPosition").value.trim(), reviewerAffiliation:$("rvAffiliation").value.trim(),
+      reviewerPhone:$("rvPhone").value.trim(), reviewerEmail:$("rvEmail").value.trim(),
+      reportDate:th, createdAt:Date.now(), round:round, dateISO:iso, provinceResults:JSON.stringify(pr)
+    };
+  }
+
+  async function saveReport(){
+    if(state.saving) return;
+    var entry = collect(); if(!entry) return;
+    var btn = $("saveBtn"); state.saving = true; btn.disabled = true; btn.textContent = "กำลังบันทึก...";
+    try{
+      if(REMOTE) await addRemote(entry); else { state.reports.push(normReport(entry)); cacheReports(); }
+      var prefs = {}; PEOPLE_IDS.forEach(function(id){ prefs[id] = $(id).value; }); lsSet(LS_PREFS, prefs);
+      state.reports = state.reports.map(function(r){ return r.pr !== undefined ? r : normReport(r); });
+      resetProvinces(); state.selectedId = entry.id; renderAll();
+      showToast("ok", "บันทึกผลรอบ " + roundLabel(entry.round) + " เรียบร้อยแล้ว" + (REMOTE ? " — ระบบจะส่งการ์ดเข้า LINE ตามเวลา" : ""), 3800);
+    }catch(err){
+      showToast("err", "บันทึกไม่สำเร็จ: " + (err && err.message ? err.message : err), 6000);
+    }finally{
+      state.saving = false; btn.disabled = false; updateSaveLabel();
+    }
+  }
+
+  // ---------- ป๊อบอัพสรุปรายงานล่าสุด ----------
+  function showModal(rep){
+    var found = rep.status === "found";
+    $("modalTop").className = "modal-top " + (found ? "found" : "notfound");
+    $("mIcon").textContent = found ? "⚠️" : "✅"; $("mStatus").textContent = found ? "พบประเด็น" : "ไม่พบประเด็น";
+    $("mDate").textContent = "ตรวจสอบข้อมูล ณ วันที่ " + (rep.checkDate || thaiFromISO(rep.dateISO)) + (roundText(rep) ? " รอบเวลา " + roundText(rep) : "");
+    $("mChipsBox").style.display = rep.pr ? "" : "none";
+    if(rep.pr) $("mChips").innerHTML = PROVINCES.map(function(p){ var x = rep.pr[p.name], s = x && x.s ? x.s : "x"; return '<span class="chip ' + s + '">' + esc(p.name) + (s === "f" ? " ⚠️" : (s === "n" ? " ✓" : "")) + '</span>'; }).join("");
+    $("mFact").textContent = rep.factDetail || "-"; $("mAction").textContent = rep.actionDetail || "-";
+    $("mReporter").textContent = (rep.reporterName || "-") + (rep.reporterPosition ? " — " + rep.reporterPosition : "");
+    $("modalOverlay").dataset.rid = rep.id; $("modalOverlay").className = "modal-overlay show"; document.body.style.overflow = "hidden";
+  }
+  function closeModal(){ $("modalOverlay").className = "modal-overlay"; document.body.style.overflow = ""; }
+
+  // ---------- PDF ----------
+  function buildPdfHtml(r){
+    var ch = [].concat.apply([], PROVINCES.map(function(p){ return p.channels; })).map(function(c){ return '<li>' + esc(c.name) + ' (' + c.type + ') ' + esc(c.url) + '</li>'; }).join("");
+    var prh = "";
+    if(r.pr){
+      prh = '<h4>ผลการตรวจสอบรายจังหวัด</h4><table class="pdf-table">' + PROVINCES.map(function(p){
+        var x = r.pr[p.name] || {}, s = x.s === "f" ? "พบประเด็น" : (x.s === "n" ? "ไม่พบประเด็น" : "-");
+        var d = (x.d || "") + (x.a ? " (ปฏิบัติ: " + x.a + ")" : "");
+        return '<tr><td style="width:90px">' + esc(p.name) + '</td><td style="width:90px">' + s + '</td><td>' + esc(d || "-") + '</td></tr>';
+      }).join("") + '</table>';
+    }
+    return '<div class="pdf-title">“No Gift Policy ทส.โปร่งใสและเป็นธรรม”</div><div class="pdf-sub">แบบฟอร์มการรายงานการตรวจสอบสื่อโซเชียล</div>' +
+      '<div class="pdf-sub2">พื้นที่รับผิดชอบ สคพ.3 (พิษณุโลก)<br>พิษณุโลก ตาก อุตรดิตถ์ สุโขทัย เพชรบูรณ์</div>' +
+      '<h4>รายชื่อ และ url Social medias ที่เฝ้าติดตาม</h4><ol>' + ch + '</ol><h4>รายงานการตรวจสอบสื่อโซเชียล</h4>' + prh +
+      '<div class="pdf-block"><div class="pdf-field"><b>ประเด็นการตรวจสอบข้อเท็จจริง</b> - ตรวจสอบข้อมูล ณ วันที่ ' + esc(r.checkDate || "-") + ' รอบเวลา ' + esc(roundText(r) || "-") + '</div>' +
+      '<div class="pdf-field"><b>ข้อเท็จจริง</b> - ' + esc(r.factDetail || "-") + '</div><div class="pdf-field"><b>การปฎิบัติ(Action)</b> - ' + esc(r.actionDetail || "-") + '</div></div>' +
+      '<div class="pdf-block"><div class="pdf-field"><b>ผู้รายงาน</b> - ชื่อ - นามสกุล ' + esc(r.reporterName || "-") + '</div><div class="pdf-field pdf-indent">- ตำแหน่ง ' + esc(r.reporterPosition || "-") + '</div><div class="pdf-field pdf-indent">- เบอร์โทรศัพท์ ' + esc(r.reporterPhone || "-") + '</div><div class="pdf-field pdf-indent">- ไปรษณีย์อิเล็กทรอนิกส์ ' + esc(r.reporterEmail || "-") + '</div></div>' +
+      '<div class="pdf-block"><div class="pdf-field"><b>ผู้ตรวจสอบ</b> - ชื่อ- นามสกุล ' + esc(r.reviewerName || "-") + '</div><div class="pdf-field pdf-indent">- ตำแหน่ง ' + esc(r.reviewerPosition || "-") + '</div><div class="pdf-field pdf-indent">- สังกัด ' + esc(r.reviewerAffiliation || "-") + '</div><div class="pdf-field pdf-indent">- เบอร์โทรศัพท์ ' + esc(r.reviewerPhone || "-") + '</div><div class="pdf-field pdf-indent">- ไปรษณีย์อิเล็กทรอนิกส์ ' + esc(r.reviewerEmail || "-") + '</div></div>' +
+      '<div class="pdf-block"><div class="pdf-field"><b>วัน/เดือน/ปี ที่รายงาน</b> - วันที่ ' + esc(r.reportDate || "-") + '</div></div><div class="pdf-footer-note">จัดทำโดยศูนย์เฝ้าระวังข้อมูลข่าวสาร สคพ.3</div>';
+  }
+  async function downloadPdf(report){
+    if(!window.html2canvas || !window.jspdf) throw new Error("ไลบรารีสร้าง PDF โหลดไม่สำเร็จ กรุณาตรวจสอบอินเทอร์เน็ตแล้วลองใหม่");
+    var page = $("pdfPage"); page.innerHTML = buildPdfHtml(report);
+    if(document.fonts && document.fonts.ready){ try{ await document.fonts.ready; }catch(e){} }
+    await sleep(60);
+    var canvas = await window.html2canvas(page, {scale:2, backgroundColor:"#ffffff", useCORS:true});
+    var pdf = new window.jspdf.jsPDF({orientation:"portrait", unit:"pt", format:"a4"});
+    var pw = pdf.internal.pageSize.getWidth(), ph = pdf.internal.pageSize.getHeight(), ih = canvas.height * pw / canvas.width;
+    if(ih <= ph){ pdf.addImage(canvas.toDataURL("image/jpeg", 0.95), "JPEG", 0, 0, pw, ih); }
+    else{
+      var pxPage = ph * canvas.width / pw, pages = Math.ceil(canvas.height / pxPage);
+      for(var p=0;p<pages;p++){
+        var sc = document.createElement("canvas"); sc.width = canvas.width; sc.height = Math.min(pxPage, canvas.height - p*pxPage);
+        var ctx = sc.getContext("2d"); ctx.fillStyle = "#fff"; ctx.fillRect(0,0,sc.width,sc.height);
+        ctx.drawImage(canvas, 0, p*pxPage, canvas.width, sc.height, 0, 0, canvas.width, sc.height);
+        if(p > 0) pdf.addPage();
+        pdf.addImage(sc.toDataURL("image/jpeg", 0.95), "JPEG", 0, 0, pw, sc.height * pw / canvas.width);
+      }
+    }
+    pdf.save("รายงานตรวจสอบสื่อโซเชียล_" + String(report.dateISO || report.checkDate || "report").replace(/[\\\/:*?"<>|\s]+/g, "_") + (report.round ? "_" + report.round.replace(":", "") : "") + ".pdf");
+  }
+
+  // ---------- init ----------
+  async function init(){
+    try{
+      renderChannels(); buildForm();
+      $("saveBtn").addEventListener("click", saveReport);
+      $("unlockBtn").addEventListener("click", function(){ tryUnlock($("pinInput").value, false); });
+      $("pinInput").addEventListener("keydown", function(e){ if(e.key === "Enter") tryUnlock($("pinInput").value, false); });
+      $("logoutBtn").addEventListener("click", function(){ state.unlocked = false; state.pin = ""; ssSet(SS_PIN, ""); applyEditorState(); renderTable(); showToast("", "ออกจากโหมดเจ้าหน้าที่แล้ว"); });
+      $("refreshBtn").addEventListener("click", async function(){ var b = $("refreshBtn"), o = b.textContent; b.disabled = true; b.textContent = "กำลังรีเฟรช..."; await refresh(true); b.textContent = o; b.disabled = false; });
+      $("searchInput").addEventListener("input", renderTable); $("statusFilter").addEventListener("change", renderTable);
+      $("modalClose").addEventListener("click", closeModal); $("mDismiss").addEventListener("click", closeModal);
+      $("modalOverlay").addEventListener("click", function(e){ if(e.target.id === "modalOverlay") closeModal(); });
+      document.addEventListener("keydown", function(e){ if(e.key === "Escape") closeModal(); });
+      $("mView").addEventListener("click", function(){
+        var id = $("modalOverlay").dataset.rid; closeModal();
+        setTimeout(function(){
+          var row = document.querySelector('tr.report-row[data-id="' + id + '"]'), det = $("detail-" + id);
+          if(row){ if(row.scrollIntoView) row.scrollIntoView({behavior:"smooth", block:"center"}); row.classList.add("highlight-flash"); setTimeout(function(){ row.classList.remove("highlight-flash"); }, 1700); }
+          if(det){ det.style.display = "table-row"; var tb = document.querySelector('.toggle[data-id="' + id + '"]'); if(tb) tb.textContent = "ซ่อนรายละเอียด ▴"; }
+        }, 260);
+      });
+
+      await loadReports();
+      renderAll();
+      var saved = ssGet(SS_PIN);
+      if(REMOTE && state.pinRequired && saved) await tryUnlock(saved, true);
+      var latest = sorted()[0];
+      if(latest) showModal(latest);
+
+      if(REMOTE){
+        setInterval(function(){ refresh(false); }, 45000);
+        document.addEventListener("visibilitychange", function(){ if(document.visibilityState === "visible") refresh(false); });
+      }
+    }catch(err){ showFatal("เริ่มต้นหน้าไม่สำเร็จ — " + (err && err.message ? err.message : err)); }
+  }
+  init();
+})();
+</script>
+</body>
+</html>
